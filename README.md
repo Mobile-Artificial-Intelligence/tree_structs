@@ -1,4 +1,4 @@
-# trees
+# tree_structs
 
 A dart library for working with tree structures.
 

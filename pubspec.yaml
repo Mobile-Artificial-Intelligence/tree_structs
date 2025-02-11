@@ -1,4 +1,4 @@
-name: trees
+name: tree_structs
 description: A dart library for working with tree structures.
 version: 1.0.0
 repository: https://github.com/danemadsen/trees

@@ -1,4 +1,4 @@
-import 'package:trees/trees.dart';
+import 'package:tree_structs/tree_structs.dart';
 
 void main() {
   final root = GeneralTreeNode('root');

@@ -1,4 +1,4 @@
-part of 'package:trees/trees.dart';
+part of 'package:tree_structs/tree_structs.dart';
 
 /// A class representing a node in a general tree structure.
 /// 
