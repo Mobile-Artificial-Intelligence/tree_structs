@@ -9,3 +9,7 @@
 ## 1.0.2
 
 - Small fix
+
+## 1.0.3
+
+- Add chain getters

@@ -13,7 +13,7 @@ To use this package, add `trees` as a [dependency in your pubspec.yaml file](htt
 
 ```yaml
 dependencies:
-  tree_structs: ^1.0.2
+  tree_structs: ^1.0.3
 ```
 
 Import the package in your code:

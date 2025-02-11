@@ -107,18 +107,6 @@ class GeneralTreeNode<T> {
   ///
   /// The first element in the list is the current node, and each subsequent
   /// element is the `currentChild` of the previous node.
-  ///
-  /// Example:
-  /// ```
-  /// GeneralTreeNode<int> node1 = GeneralTreeNode(1);
-  /// GeneralTreeNode<int> node2 = GeneralTreeNode(2);
-  /// GeneralTreeNode<int> node3 = GeneralTreeNode(3);
-  /// node1.currentChild = node2;
-  /// node2.currentChild = node3;
-  ///
-  /// List<GeneralTreeNode<int>> chain = node1.chain;
-  /// // chain will contain [node1, node2, node3]
-  /// ```
   List<GeneralTreeNode<T>> get chain {
     final List<GeneralTreeNode<T>> chain = [this];
 
@@ -129,11 +117,33 @@ class GeneralTreeNode<T> {
     return chain;
   }
 
+  /// Returns a list of `GeneralTreeNode<T>` representing the chain of nodes
+  /// starting from the current node and following the `parent` references
+  /// until a node with no `parent` is found.
+  /// 
+  /// The last element in the list is the root node, and each subsequent
+  /// element is the `child` of the previous node.
+  List<GeneralTreeNode<T>> get reverseChain {
+    final List<GeneralTreeNode<T>> chain = [this];
+
+    while (chain.last.parent != null) {
+      chain.add(chain.last.parent!);
+    }
+
+    return chain.reversed.toList();
+  }
+
   /// Returns a list of data from the nodes in the chain.
   ///
   /// This getter maps each node in the chain to its data and collects
   /// them into a list.
   List<T> get chainData => chain.map((node) => node.data).toList();
+
+  /// Returns a list of data from the nodes in the reverse chain.
+  /// 
+  /// This getter maps each node in the reverse chain to its data and collects
+  /// them into a list.
+  List<T> get reverseChainData => reverseChain.map((node) => node.data).toList();
 
   /// Adds a new child node with the given data to the current node.
   ///
@@ -391,6 +401,21 @@ class GeneralTree<T> {
   /// Returns `null` if there is no current root node.
   GeneralTreeNode<T>? get currentRoot =>
       _currentRootIndex != null ? roots[_currentRootIndex!] : null;
+
+  /// Returns the chain of `GeneralTreeNode` objects starting from the current root.
+  /// 
+  /// If `_currentRootIndex` is `null`, an empty list is returned.
+  /// Otherwise, it returns the chain of nodes from the root at `_currentRootIndex`.
+  List<GeneralTreeNode<T>> get chain {
+    if (_currentRootIndex == null) {
+      return [];
+    }
+
+    return roots[_currentRootIndex!].chain;
+  }
+
+  /// Returns the list of data from the nodes in the chain.
+  List<T> get chainData => chain.map((node) => node.data).toList();
 
   /// Adds a new root node with the given data.
   ///
