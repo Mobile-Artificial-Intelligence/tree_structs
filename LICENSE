@@ -1,49 +1,3 @@
-# trees
-
-A dart library for working with tree structures.
-
-## Features
-
-- Support for general trees
-- bfs and dfs traversal
-
-## Getting started
-
-To use this package, add `trees` as a [dependency in your pubspec.yaml file](https://flutter.dev/docs/development/packages-and-plugins/using-packages).
-
-```yaml
-dependencies:
-  trees: ^1.0.0
-```
-
-Import the package in your code:
-
-```dart
-import 'package:trees/trees.dart';
-```
-
-## Usage
-
-An example of creating a tree and traversing it:
-
-```dart
-final root = GeneralTreeNode('root');
-root.addChild('child1');
-root.addChild('child2');
-
-root.currentChild!.addChild('grandchild1');
-root.currentChild!.addChild('grandchild2');
-
-root.currentChild!.nextChild();
-
-root.currentChild!.currentChild!.addChild('great-grandchild1');
-
-print(root.chainData); // [root, child2]
-```
-
-## License
-
-```
 MIT License
 
 Copyright (c) 2025 Dane Madsen
@@ -65,4 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-```

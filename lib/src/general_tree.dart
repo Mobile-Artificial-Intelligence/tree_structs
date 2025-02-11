@@ -1,27 +1,118 @@
 part of 'package:trees/trees.dart';
 
+/// A class representing a node in a general tree structure.
+/// 
+/// Each node contains data of type [T], a reference to its parent node, and a list of its children nodes.
+/// 
+/// The class provides methods for tree traversal, manipulation, and querying.
+/// 
+/// - [data]: The data contained in the node.
+/// - [parent]: The parent node of this node.
+/// - [_children]: The list of children nodes of this node.
+/// - [_currentChildIndex]: The index of the current child node.
+/// 
+/// Methods:
+/// 
+/// - [currentChild]: Returns the current child node.
+/// - [children]: Returns the list of children nodes.
+/// - [childrenData]: Returns the list of data of the children nodes.
+/// - [siblings]: Returns the list of sibling nodes.
+/// - [siblingsData]: Returns the list of data of the sibling nodes.
+/// - [chain]: Returns the chain of nodes starting from this node and following the current child nodes.
+/// - [chainData]: Returns the list of data of the nodes in the chain.
+/// - [addChild]: Adds a new child node with the given data.
+/// - [removeChild]: Removes a child node with the given data.
+/// - [removeChildNode]: Removes the given child node.
+/// - [removeWhereChild]: Removes a child node that satisfies the given test.
+/// - [removeWhereChildNode]: Removes a child node that satisfies the given test.
+/// - [nextChild]: Moves to the next child node.
+/// - [previousChild]: Moves to the previous child node.
+/// - [bfs]: Performs a breadth-first search and returns the data of the first node that satisfies the given test.
+/// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
+/// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
+/// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
 class GeneralTreeNode<T> {
+  /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
+  /// 
+  /// The [data] parameter is the value stored in the node.
+  /// The [parent] parameter is the parent node of this node, if any.
   GeneralTreeNode(this.data, [this.parent]);
 
+  /// The data stored in the node of the tree.
+  /// 
+  /// This is a generic type [T] which allows the tree to store any type of data.
   final T data;
+
+  /// The parent node of the current node in the general tree.
+  /// 
+  /// This property holds a reference to the parent node of type `GeneralTreeNode<T>?`.
+  /// It can be `null` if the current node is the root of the tree.
   final GeneralTreeNode<T>? parent;
+
   final List<GeneralTreeNode<T>> _children = [];
 
   int? _currentChildIndex;
 
+  /// Gets the current child node of the general tree node.
+  /// 
+  /// Returns the current child node if the `_currentChildIndex` is not null,
+  /// otherwise returns null.
   GeneralTreeNode<T>? get currentChild => _currentChildIndex != null ? _children[_currentChildIndex!] : null;
 
+  /// Returns the list of child nodes of the current tree node.
+  /// 
+  /// This getter provides access to the `_children` list, which contains
+  /// all the direct descendants of this node in the tree.
+  /// 
+  /// Example:
+  /// ```dart
+  /// var children = node.children;
+  /// ```
+  /// 
+  /// Returns a `List<GeneralTreeNode<T>>` representing the child nodes.
   List<GeneralTreeNode<T>> get children => _children;
+
+  /// Returns a list of data from the children nodes.
+  ///
+  /// This getter maps over the `_children` list and extracts the `data`
+  /// property from each child node, returning a list of these data values.
   List<T> get childrenData => _children.map((child) => child.data).toList();
 
+  /// Returns a list of sibling nodes.
+  ///
+  /// If the current node has no parent, an empty list is returned.
+  /// Otherwise, it returns all children of the parent node except the current node.
   List<GeneralTreeNode<T>> get siblings {
     if (parent == null) {
       return [];
     }
     return parent!.children.where((child) => child != this).toList();
   }
+
+  /// Returns a list of data from the sibling nodes.
+  ///
+  /// This getter maps over the sibling nodes and extracts their data,
+  /// returning a list of the data from each sibling.
   List<T> get siblingsData => siblings.map((sibling) => sibling.data).toList();
 
+  /// Returns a list of `GeneralTreeNode<T>` representing the chain of nodes
+  /// starting from the current node and following the `currentChild` references
+  /// until a node with no `currentChild` is found.
+  ///
+  /// The first element in the list is the current node, and each subsequent
+  /// element is the `currentChild` of the previous node.
+  ///
+  /// Example:
+  /// ```
+  /// GeneralTreeNode<int> node1 = GeneralTreeNode(1);
+  /// GeneralTreeNode<int> node2 = GeneralTreeNode(2);
+  /// GeneralTreeNode<int> node3 = GeneralTreeNode(3);
+  /// node1.currentChild = node2;
+  /// node2.currentChild = node3;
+  ///
+  /// List<GeneralTreeNode<int>> chain = node1.chain;
+  /// // chain will contain [node1, node2, node3]
+  /// ```
   List<GeneralTreeNode<T>> get chain {
     final List<GeneralTreeNode<T>> chain = [this];
 
@@ -31,26 +122,83 @@ class GeneralTreeNode<T> {
 
     return chain;
   }
+
+  /// Returns a list of data from the nodes in the chain.
+  ///
+  /// This getter maps each node in the chain to its data and collects
+  /// them into a list.
   List<T> get chainData => chain.map((node) => node.data).toList();
 
+  /// Adds a new child node with the given data to the current node.
+  ///
+  /// The new child node is created with the provided [newData] and is added
+  /// to the list of children of the current node.
+  ///
+  /// If the `_currentChildIndex` is `null`, it is initialized to `0`.
+  ///
+  /// - Parameter newData: The data for the new child node.
   void addChild(T newData) {
     _currentChildIndex ??= 0;
 
     _children.add(GeneralTreeNode(newData, this));
   }
 
+  /// Removes a child node from the tree that matches the given data.
+  ///
+  /// This method searches for a child node with the specified [removeData]
+  /// and removes it from the tree if found.
+  ///
+  /// - Parameter removeData: The data of the child node to be removed.
   void removeChild(T removeData) {
     removeWhereChild((childData) => childData == removeData);
   }
 
+  /// Removes a child node from the current node's children.
+  ///
+  /// This method removes the specified [removeNode] from the list of children
+  /// of the current node. It uses the `removeWhereChildNode` method to find
+  /// and remove the child node that matches the given [removeNode].
+  ///
+  /// - Parameter removeNode: The child node to be removed.
   void removeChildNode(GeneralTreeNode<T> removeNode) {
     removeWhereChildNode((child) => child == removeNode);
   }
 
+  /// Removes child nodes that satisfy the given test function.
+  ///
+  /// The [test] function is applied to the data of each child node, and if it
+  /// returns `true`, the corresponding child node is removed.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// tree.removeWhereChild((data) => data.isEmpty);
+  /// ```
+  ///
+  /// This will remove all child nodes whose data is empty.
+  ///
+  /// - Parameter test: A function that takes a child node's data and returns
+  ///   `true` if the child node should be removed, and `false` otherwise.
   void removeWhereChild(bool Function(T) test) {
     removeWhereChildNode((child) => test(child.data));
   }
 
+  /// Removes a child node from the tree that satisfies the given test function.
+  ///
+  /// The [test] function is used to find the index of the child node to be removed.
+  /// If no child node satisfies the test function, a [StateError] is thrown.
+  ///
+  /// After removing the child node, the method updates the [_currentChildIndex] if necessary:
+  /// - If [_currentChildIndex] is greater than the removed index, it is decremented by 1.
+  /// - If [_currentChildIndex] is equal to the removed index, it is set to the last index of the remaining children.
+  /// - If [_currentChildIndex] becomes less than 0, it is set to null.
+  ///
+  /// Throws:
+  /// - [StateError] if no child node satisfies the [test] function.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// tree.removeWhereChildNode((node) => node.value == someValue);
+  /// ```
   void removeWhereChildNode(bool Function(GeneralTreeNode<T>) test) {
     final index = _children.indexWhere(test);
 
@@ -76,6 +224,11 @@ class GeneralTreeNode<T> {
     }
   }
 
+  /// Advances the current child index to the next child in the list of children.
+  /// 
+  /// If the current child index is `null`, it initializes it to `0`. If the 
+  /// current child index is less than the length of the children list minus one,
+  /// it increments the current child index by one.
   void nextChild() {
     _currentChildIndex ??= 0;
 
@@ -84,6 +237,10 @@ class GeneralTreeNode<T> {
     }
   }
 
+  /// Moves the current child index to the previous child if possible.
+  /// 
+  /// If the current child index is `null`, it initializes it to `0`.
+  /// If the current child index is greater than `0`, it decrements the index by `1`.
   void previousChild() {
     _currentChildIndex ??= 0;
 
@@ -92,14 +249,61 @@ class GeneralTreeNode<T> {
     }
   }
 
+  /// Performs a breadth-first search (BFS) on the tree to find a node that satisfies the given test function.
+  ///
+  /// The [test] function is applied to the data of each node in the tree. The search stops as soon as a node
+  /// satisfying the test is found, and the data of that node is returned. If no such node is found, `null` is returned.
+  ///
+  /// - Parameter test: A function that takes a node's data and returns `true` if the node satisfies the condition, `false` otherwise.
+  ///
+  /// - Returns: The data of the first node that satisfies the test function, or `null` if no such node is found.
   T? bfs(bool Function(T) test) {
     return bfsNode((node) => test(node.data))?.data;
   }
 
+  /// Performs a depth-first search (DFS) on the tree and returns the data of the first node
+  /// that satisfies the given test function.
+  ///
+  /// The [test] function is a predicate that takes a node's data and returns `true` if the
+  /// node satisfies the condition, otherwise `false`.
+  ///
+  /// Returns the data of the first node that satisfies the [test] function, or `null` if no
+  /// such node is found.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// var result = tree.dfs((data) => data == targetValue);
+  /// if (result != null) {
+  ///   print('Found node with data: $result');
+  /// } else {
+  ///   print('No node found with the target value.');
+  /// }
+  /// ```
   T? dfs(bool Function(T) test) {
     return dfsNode((node) => test(node.data))?.data;
   }
 
+  /// Performs a breadth-first search (BFS) on the tree starting from this node
+  /// to find a node that satisfies the given test function.
+  ///
+  /// The search first checks the current node, then its immediate children,
+  /// and then recursively checks the children of each child node.
+  ///
+  /// The [test] function is a predicate that takes a [GeneralTreeNode] and
+  /// returns a boolean indicating whether the node satisfies the condition.
+  ///
+  /// Returns the first node that satisfies the [test] function, or `null` if
+  /// no such node is found.
+  ///
+  /// Example usage:
+  /// ```dart
+  /// final node = root.bfsNode((node) => node.value == targetValue);
+  /// if (node != null) {
+  ///   print('Node found: ${node.value}');
+  /// } else {
+  ///   print('Node not found');
+  /// }
+  /// ```
   GeneralTreeNode<T>? bfsNode(bool Function(GeneralTreeNode<T>) test) {
     if (test(this)) {
       return this;
@@ -121,6 +325,18 @@ class GeneralTreeNode<T> {
     return null;
   }
 
+  /// Performs a depth-first search (DFS) on the tree starting from this node.
+  ///
+  /// Iterates through the tree nodes and returns the first node that satisfies
+  /// the given test function.
+  ///
+  /// The search starts from the current node and proceeds to its children
+  /// recursively.
+  ///
+  /// - Parameter test: A function that takes a `GeneralTreeNode<T>` and returns
+  ///   a boolean indicating whether the node satisfies the condition.
+  /// - Returns: The first `GeneralTreeNode<T>` that satisfies the test function,
+  ///   or `null` if no such node is found.
   GeneralTreeNode<T>? dfsNode(bool Function(GeneralTreeNode<T>) test) {
     if (test(this)) {
       return this;
