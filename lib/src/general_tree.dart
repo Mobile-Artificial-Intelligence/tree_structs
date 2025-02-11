@@ -1,18 +1,18 @@
 part of 'package:tree_structs/tree_structs.dart';
 
 /// A class representing a node in a general tree structure.
-/// 
+///
 /// Each node contains data of type [T], a reference to its parent node, and a list of its children nodes.
-/// 
+///
 /// The class provides methods for tree traversal, manipulation, and querying.
-/// 
+///
 /// - [data]: The data contained in the node.
 /// - [parent]: The parent node of this node.
 /// - [_children]: The list of children nodes of this node.
 /// - [_currentChildIndex]: The index of the current child node.
-/// 
+///
 /// Methods:
-/// 
+///
 /// - [currentChild]: Returns the current child node.
 /// - [children]: Returns the list of children nodes.
 /// - [childrenData]: Returns the list of data of the children nodes.
@@ -33,18 +33,18 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
 class GeneralTreeNode<T> {
   /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
-  /// 
+  ///
   /// The [data] parameter is the value stored in the node.
   /// The [parent] parameter is the parent node of this node, if any.
   GeneralTreeNode(this.data, [this.parent]);
 
   /// The data stored in the node of the tree.
-  /// 
+  ///
   /// This is a generic type [T] which allows the tree to store any type of data.
   final T data;
 
   /// The parent node of the current node in the general tree.
-  /// 
+  ///
   /// This property holds a reference to the parent node of type `GeneralTreeNode<T>?`.
   /// It can be `null` if the current node is the root of the tree.
   final GeneralTreeNode<T>? parent;
@@ -54,26 +54,27 @@ class GeneralTreeNode<T> {
   int? _currentChildIndex;
 
   /// Gets the index of the current child node.
-  /// 
+  ///
   /// Returns `null` if there is no current child node.
   int? get currentChildIndex => _currentChildIndex;
 
   /// Gets the current child node of the general tree node.
-  /// 
+  ///
   /// Returns the current child node if the `_currentChildIndex` is not null,
   /// otherwise returns null.
-  GeneralTreeNode<T>? get currentChild => _currentChildIndex != null ? _children[_currentChildIndex!] : null;
+  GeneralTreeNode<T>? get currentChild =>
+      _currentChildIndex != null ? _children[_currentChildIndex!] : null;
 
   /// Returns the list of child nodes of the current tree node.
-  /// 
+  ///
   /// This getter provides access to the `_children` list, which contains
   /// all the direct descendants of this node in the tree.
-  /// 
+  ///
   /// Example:
   /// ```dart
   /// var children = node.children;
   /// ```
-  /// 
+  ///
   /// Returns a `List<GeneralTreeNode<T>>` representing the child nodes.
   List<GeneralTreeNode<T>> get children => _children;
 
@@ -230,8 +231,8 @@ class GeneralTreeNode<T> {
   }
 
   /// Advances the current child index to the next child in the list of children.
-  /// 
-  /// If the current child index is `null`, it initializes it to `0`. If the 
+  ///
+  /// If the current child index is `null`, it initializes it to `0`. If the
   /// current child index is less than the length of the children list minus one,
   /// it increments the current child index by one.
   void nextChild() {
@@ -243,7 +244,7 @@ class GeneralTreeNode<T> {
   }
 
   /// Moves the current child index to the previous child if possible.
-  /// 
+  ///
   /// If the current child index is `null`, it initializes it to `0`.
   /// If the current child index is greater than `0`, it decrements the index by `1`.
   void previousChild() {
@@ -359,14 +360,14 @@ class GeneralTreeNode<T> {
 }
 
 /// A class representing a general tree structure with multiple roots.
-/// 
+///
 /// The [GeneralTree] class allows for the creation and manipulation of a tree
 /// with multiple root nodes. Each root node can have its own subtree.
-/// 
+///
 /// Type parameter [T] specifies the type of data stored in the tree nodes.
 class GeneralTree<T> {
   /// Creates a [GeneralTree] with the given list of root nodes.
-  /// 
+  ///
   /// If the list of roots is not empty, the current root index is set to 0.
   GeneralTree(this.roots);
 
@@ -374,7 +375,7 @@ class GeneralTree<T> {
   final List<GeneralTreeNode<T>> roots;
 
   /// The index of the current root node.
-  /// 
+  ///
   /// This is `null` if there are no root nodes.
   int? _currentRootIndex;
 
@@ -382,12 +383,13 @@ class GeneralTree<T> {
   int? get currentRootIndex => _currentRootIndex;
 
   /// Gets the current root node.
-  /// 
+  ///
   /// Returns `null` if there is no current root node.
-  GeneralTreeNode<T>? get currentRoot => _currentRootIndex != null ? roots[_currentRootIndex!] : null;
+  GeneralTreeNode<T>? get currentRoot =>
+      _currentRootIndex != null ? roots[_currentRootIndex!] : null;
 
   /// Adds a new root node with the given data.
-  /// 
+  ///
   /// The new root node is created with the provided [data] and is added to the list of roots.
   void addRoot(T data) {
     roots.add(GeneralTreeNode(data));
@@ -414,7 +416,7 @@ class GeneralTree<T> {
     if (roots.isEmpty) {
       return;
     }
-    
+
     final index = roots.indexWhere(test);
 
     if (index == -1) {
@@ -440,7 +442,7 @@ class GeneralTree<T> {
   }
 
   /// Moves to the next root node.
-  /// 
+  ///
   /// If the current root index is `null`, it is set to 0.
   /// If the current root index is the last root node, it remains unchanged.
   void nextRoot() {
@@ -456,7 +458,7 @@ class GeneralTree<T> {
   }
 
   /// Moves to the previous root node.
-  /// 
+  ///
   /// If the current root index is `null`, it is set to 0.
   /// If the current root index is the first root node, it remains unchanged.
   void previousRoot() {
