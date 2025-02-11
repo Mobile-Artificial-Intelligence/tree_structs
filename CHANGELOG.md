@@ -5,3 +5,7 @@
 ## 1.0.1
 
 - Add General Tree for roots
+
+## 1.0.2
+
+- Small fix

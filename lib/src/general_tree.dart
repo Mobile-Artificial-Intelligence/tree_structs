@@ -369,7 +369,11 @@ class GeneralTree<T> {
   /// Creates a [GeneralTree] with the given list of root nodes.
   ///
   /// If the list of roots is not empty, the current root index is set to 0.
-  GeneralTree(this.roots);
+  GeneralTree(this.roots) {
+    if (roots.isNotEmpty) {
+      _currentRootIndex = 0;
+    }
+  }
 
   /// The list of root nodes in the tree.
   final List<GeneralTreeNode<T>> roots;
