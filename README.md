@@ -13,13 +13,13 @@ To use this package, add `trees` as a [dependency in your pubspec.yaml file](htt
 
 ```yaml
 dependencies:
-  trees: ^1.0.0
+  tree_structs: ^1.0.0
 ```
 
 Import the package in your code:
 
 ```dart
-import 'package:trees/trees.dart';
+import 'package:tree_structs/tree_structs.dart';
 ```
 
 ## Usage
