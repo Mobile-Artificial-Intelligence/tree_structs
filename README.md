@@ -13,7 +13,7 @@ To use this package, add `trees` as a [dependency in your pubspec.yaml file](htt
 
 ```yaml
 dependencies:
-  tree_structs: ^1.0.0
+  tree_structs: ^1.0.1
 ```
 
 Import the package in your code:
@@ -27,18 +27,16 @@ import 'package:tree_structs/tree_structs.dart';
 An example of creating a tree and traversing it:
 
 ```dart
-final root = GeneralTreeNode('root');
-root.addChild('child1');
-root.addChild('child2');
+final tree = GeneralTree<String>([]);
+tree.addRoot('root');
+tree.currentRoot!.chain[0].addChild('child1');
+tree.currentRoot!.chain[0].addChild('child2');
+tree.currentRoot!.chain[1].addChild('grandchild1');
+tree.currentRoot!.chain[1].addChild('grandchild2');
+tree.currentRoot!.chain[2].addChild('greatgrandchild1');
+tree.currentRoot!.chain[2].addChild('greatgrandchild2');
 
-root.currentChild!.addChild('grandchild1');
-root.currentChild!.addChild('grandchild2');
-
-root.currentChild!.nextChild();
-
-root.currentChild!.currentChild!.addChild('great-grandchild1');
-
-print(root.chainData); // [root, child2]
+print(tree.currentRoot!.chainData);
 ```
 
 ## License
