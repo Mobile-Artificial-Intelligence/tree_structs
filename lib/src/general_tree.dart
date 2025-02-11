@@ -5,165 +5,134 @@ class GeneralTreeNode<T> {
 
   final T data;
   final GeneralTreeNode<T>? parent;
-  GeneralTreeNode<T>? _nextSibling;
-  GeneralTreeNode<T>? _lastSibling;
-  GeneralTreeNode<T>? _child;
+  final List<GeneralTreeNode<T>> _children = [];
 
-  GeneralTreeNode<T>? get nextSibling => _nextSibling;
-  GeneralTreeNode<T>? get lastSibling => _lastSibling;
-  GeneralTreeNode<T>? get child => _child;
+  int? _currentChildIndex;
 
-  List<GeneralTreeNode<T>> get nextSiblings => _nextSibling != null ? [_nextSibling!, ..._nextSibling!.nextSiblings] : [];
-  List<GeneralTreeNode<T>> get lastSiblings => _lastSibling != null ? [_lastSibling!, ..._lastSibling!.lastSiblings] : [];
-  List<GeneralTreeNode<T>> get siblings => [...lastSiblings, ...nextSiblings];
-  List<GeneralTreeNode<T>> get children => _child != null ? [..._child!.lastSiblings, _child!, ..._child!.nextSiblings] : [];
-  List<GeneralTreeNode<T>> get descendants => _child != null ? [...children, ..._child!.descendants] : [];
-  List<GeneralTreeNode<T>> get descendantsChain => _child != null ? [_child!, ..._child!.descendantsChain] : [];
-  List<GeneralTreeNode<T>> get ancestors => parent != null ? [...parent!.lastSiblings, parent!, ...parent!.nextSiblings, ...parent!.ancestors] : [];
-  List<GeneralTreeNode<T>> get ancestorsChain => parent != null ? [parent!, ...parent!.ancestorsChain] : [];
-  List<GeneralTreeNode<T>> get chain => [...ancestorsChain, this, ...descendantsChain];
+  GeneralTreeNode<T>? get currentChild => _currentChildIndex != null ? _children[_currentChildIndex!] : null;
 
-  void addSibling(T newData) {
-    GeneralTreeNode<T>? currentSibling = this;
+  List<GeneralTreeNode<T>> get children => _children;
+  List<T> get childrenData => _children.map((child) => child.data).toList();
 
-    while (currentSibling!._nextSibling != null) {
-      currentSibling = currentSibling._nextSibling;
+  List<GeneralTreeNode<T>> get siblings {
+    if (parent == null) {
+      return [];
     }
-
-    currentSibling._nextSibling = GeneralTreeNode(newData, parent);
-    currentSibling._nextSibling!._lastSibling = currentSibling;
+    return parent!.children.where((child) => child != this).toList();
   }
+  List<T> get siblingsData => siblings.map((sibling) => sibling.data).toList();
 
-  void removeSibling(T removeData) {
-    GeneralTreeNode<T>? currentSibling = this;
+  List<GeneralTreeNode<T>> get chain {
+    final List<GeneralTreeNode<T>> chain = [this];
 
-    while (currentSibling!._lastSibling != null) {
-      if (currentSibling._lastSibling!.data == removeData) {
-        final newLastSibling = currentSibling._lastSibling!._lastSibling;
-        currentSibling._lastSibling = newLastSibling;
-        if (newLastSibling != null) {
-          newLastSibling._nextSibling = currentSibling;
-        }
-        return;
-      }
-      currentSibling = currentSibling._lastSibling;
+    while (chain.last.currentChild != null) {
+      chain.add(chain.last.currentChild!);
     }
 
-    currentSibling = _child;
-
-    while (currentSibling!._nextSibling != null) {
-      if (currentSibling._nextSibling!.data == removeData) {
-        final newNextSibling = currentSibling._nextSibling!._nextSibling;
-        currentSibling._nextSibling = newNextSibling;
-        if (newNextSibling != null) {
-          newNextSibling._lastSibling = currentSibling;
-        }
-        return;
-      }
-      currentSibling = currentSibling._nextSibling;
-    }
-
-    throw StateError('Node not found');
+    return chain;
   }
+  List<T> get chainData => chain.map((node) => node.data).toList();
 
   void addChild(T newData) {
-    if (_child == null) {
-      _child = GeneralTreeNode(newData, this);
-    } 
-    else {
-      _child!.addSibling(newData);
-    }
+    _currentChildIndex ??= 0;
+
+    _children.add(GeneralTreeNode(newData, this));
   }
 
   void removeChild(T removeData) {
-    if (_child == null) {
-      throw StateError('Node has no children');
+    removeWhereChild((childData) => childData == removeData);
+  }
+
+  void removeChildNode(GeneralTreeNode<T> removeNode) {
+    removeWhereChildNode((child) => child == removeNode);
+  }
+
+  void removeWhereChild(bool Function(T) test) {
+    removeWhereChildNode((child) => test(child.data));
+  }
+
+  void removeWhereChildNode(bool Function(GeneralTreeNode<T>) test) {
+    final index = _children.indexWhere(test);
+
+    if (index == -1) {
+      throw StateError('Child not found');
     }
 
-    if (_child!.data == removeData) {
-      if (_child!._nextSibling != null) {
-        final newLastSibling = _child!._lastSibling;
-        _child = _child!._nextSibling;
-        _child!._lastSibling = newLastSibling;
-      } 
-      else if (_child!._lastSibling != null) {
-        _child = _child!._lastSibling;
-        _child!._nextSibling = null;
-      } 
-      else {
-        _child = null;
-      }
+    _children.removeAt(index);
+
+    if (_currentChildIndex == null) return;
+
+    if (_currentChildIndex! > index) {
+      _currentChildIndex = _currentChildIndex! - 1;
       return;
     }
 
-    var currentChild = _child;
+    if (_currentChildIndex! == index) {
+      _currentChildIndex = _children.length - 1;
+    }
 
-    while (currentChild!._lastSibling != null) {
-      if (currentChild._lastSibling!.data == removeData) {
-        final newLastSibling = currentChild._lastSibling!._lastSibling;
-        currentChild._lastSibling = newLastSibling;
-        if (newLastSibling != null) {
-          newLastSibling._nextSibling = currentChild;
-        }
-        return;
+    if (_currentChildIndex! < 0) {
+      _currentChildIndex = null;
+    }
+  }
+
+  void nextChild() {
+    _currentChildIndex ??= 0;
+
+    if (_currentChildIndex! < _children.length - 1) {
+      _currentChildIndex = _currentChildIndex! + 1;
+    }
+  }
+
+  void previousChild() {
+    _currentChildIndex ??= 0;
+
+    if (_currentChildIndex! > 0) {
+      _currentChildIndex = _currentChildIndex! - 1;
+    }
+  }
+
+  T? bfs(bool Function(T) test) {
+    return bfsNode((node) => test(node.data))?.data;
+  }
+
+  T? dfs(bool Function(T) test) {
+    return dfsNode((node) => test(node.data))?.data;
+  }
+
+  GeneralTreeNode<T>? bfsNode(bool Function(GeneralTreeNode<T>) test) {
+    if (test(this)) {
+      return this;
+    }
+
+    for (final child in _children) {
+      if (test(child)) {
+        return child;
       }
-      currentChild = currentChild._lastSibling;
     }
 
-    currentChild = _child;
-
-    while (currentChild!._nextSibling != null) {
-      if (currentChild._nextSibling!.data == removeData) {
-        final newNextSibling = currentChild._nextSibling!._nextSibling;
-        currentChild._nextSibling = newNextSibling;
-        if (newNextSibling != null) {
-          newNextSibling._lastSibling = currentChild;
-        }
-        return;
+    for (final child in _children) {
+      final result = child.bfsNode(test);
+      if (result != null) {
+        return result;
       }
-      currentChild = currentChild._nextSibling;
     }
 
-    throw StateError('Node not found');
+    return null;
   }
 
-  void switchNextSibling() {
-    if (_nextSibling == null) {
-      throw StateError('Node has no next sibling');
+  GeneralTreeNode<T>? dfsNode(bool Function(GeneralTreeNode<T>) test) {
+    if (test(this)) {
+      return this;
     }
 
-    if (parent == null) {
-      throw StateError('Node has no parent');
+    for (final child in _children) {
+      final result = child.dfsNode(test);
+      if (result != null) {
+        return result;
+      }
     }
 
-    parent!._child = _nextSibling;
-  }
-
-  void switchLastSibling() {
-    if (_lastSibling == null) {
-      throw StateError('Node has no last sibling');
-    }
-
-    if (parent == null) {
-      throw StateError('Node has no parent');
-    }
-
-    parent!._child = _lastSibling;
-  }
-
-  void switchNextChild() {
-    if (_child == null) {
-      throw StateError('Node has no children');
-    }
-
-    _child!.switchNextSibling();
-  }
-
-  void switchLastChild() {
-    if (_child == null) {
-      throw StateError('Node has no children');
-    }
-
-    _child!.switchLastSibling();
+    return null;
   }
 }
