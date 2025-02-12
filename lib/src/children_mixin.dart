@@ -1,6 +1,6 @@
 part of 'package:tree_structs/tree_structs.dart';
 
-mixin _AddAndRemoveChildMixin<T> on _SelectedChildMixin {
+mixin _ChildrenMixin<T> on _SelectedChildMixin {
   List<T> get _children;
 
   /// Adds a new child node with the given data to the current node.

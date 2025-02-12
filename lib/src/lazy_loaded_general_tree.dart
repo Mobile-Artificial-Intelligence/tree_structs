@@ -2,7 +2,7 @@ part of 'package:tree_structs/tree_structs.dart';
 
 typedef Future<T> LazyLoader<T>();
 
-class LazyLoadedGeneralNode<T> with _SelectedChildMixin, _AddAndRemoveChildMixin<LazyLoadedGeneralNode<T>> {
+class LazyLoadedGeneralNode<T> with _SelectedChildMixin, _ChildrenMixin<LazyLoadedGeneralNode<T>> {
   LazyLoadedGeneralNode(
     this.data, {
     this.parentLoader, 

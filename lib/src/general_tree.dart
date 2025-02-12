@@ -32,7 +32,7 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
 /// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
 /// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
-class GeneralTreeNode<T> with _SelectedChildMixin, _AddAndRemoveChildMixin<GeneralTreeNode<T>> {
+class GeneralTreeNode<T> with _SelectedChildMixin, _ChildrenMixin<GeneralTreeNode<T>> {
   /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
   ///
   /// The [data] parameter is the value stored in the node.
