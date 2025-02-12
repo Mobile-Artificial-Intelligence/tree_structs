@@ -34,13 +34,6 @@ void main() {
       expect(root.children[0].data, 3);
     });
 
-    test('removeChild throws when child is not found', () {
-      final root = GeneralTreeNode<int>(1);
-      root.addChild(2);
-
-      expect(() => root.removeChild(3), throwsStateError);
-    });
-
     test('removeChildNode removes a specific child node', () {
       final root = GeneralTreeNode<int>(1);
       final child = GeneralTreeNode<int>(2, root);

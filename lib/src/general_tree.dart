@@ -31,7 +31,7 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
 /// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
 /// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
-class GeneralTreeNode<T> {
+class GeneralTreeNode<T> with _SelectedChildMixin {
   /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
   ///
   /// The [data] parameter is the value stored in the node.
@@ -47,16 +47,12 @@ class GeneralTreeNode<T> {
   ///
   /// This property holds a reference to the parent node of type `GeneralTreeNode<T>?`.
   /// It can be `null` if the current node is the root of the tree.
-  final GeneralTreeNode<T>? parent;
+  GeneralTreeNode<T>? parent;
 
   final List<GeneralTreeNode<T>> _children = [];
 
-  int? _currentChildIndex;
-
-  /// Gets the index of the current child node.
-  ///
-  /// Returns `null` if there is no current child node.
-  int? get currentChildIndex => _currentChildIndex;
+  @override
+  int? get _childrenCount => _children.length;
 
   /// Gets the current child node of the general tree node.
   ///
@@ -241,31 +237,6 @@ class GeneralTreeNode<T> {
     }
   }
 
-  /// Advances the current child index to the next child in the list of children.
-  ///
-  /// If the current child index is `null`, it initializes it to `0`. If the
-  /// current child index is less than the length of the children list minus one,
-  /// it increments the current child index by one.
-  void nextChild() {
-    _currentChildIndex ??= 0;
-
-    if (_currentChildIndex! < _children.length - 1) {
-      _currentChildIndex = _currentChildIndex! + 1;
-    }
-  }
-
-  /// Moves the current child index to the previous child if possible.
-  ///
-  /// If the current child index is `null`, it initializes it to `0`.
-  /// If the current child index is greater than `0`, it decrements the index by `1`.
-  void previousChild() {
-    _currentChildIndex ??= 0;
-
-    if (_currentChildIndex! > 0) {
-      _currentChildIndex = _currentChildIndex! - 1;
-    }
-  }
-
   /// Performs a breadth-first search (BFS) on the tree to find a node that satisfies the given test function.
   ///
   /// The [test] function is applied to the data of each node in the tree. The search stops as soon as a node
@@ -326,16 +297,23 @@ class GeneralTreeNode<T> {
       return this;
     }
 
-    for (final child in _children) {
-      if (test(child)) {
-        return child;
-      }
+    if (_children.isEmpty) {
+      return null;
     }
 
-    for (final child in _children) {
-      final result = child.bfsNode(test);
-      if (result != null) {
-        return result;
+    final queue = Queue<GeneralTreeNode<T>>.from(_children);
+
+    while (queue.isNotEmpty) {
+      final current = queue.removeFirst();
+
+      for (final child in current._children) {
+        if (test(child)) {
+          return child;
+        }
+        
+        if (child._children.isNotEmpty) {
+          queue.addAll(child._children);
+        }
       }
     }
 
