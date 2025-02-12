@@ -2,7 +2,7 @@ part of 'package:tree_structs/tree_structs.dart';
 
 typedef Future<T> LazyLoader<T>();
 
-class LazyLoadedGeneralNode<T> with _SelectedChildMixin {
+class LazyLoadedGeneralNode<T> with _SelectedChildMixin, _AddAndRemoveChildMixin<LazyLoadedGeneralNode<T>> {
   LazyLoadedGeneralNode(
     this.data, {
     this.parentLoader, 
@@ -37,9 +37,10 @@ class LazyLoadedGeneralNode<T> with _SelectedChildMixin {
   }
 
   @override
-  int? get _childrenCount => _children?.length;
+  int get _childrenCount => _children.length;
 
-  List<LazyLoadedGeneralNode<T>>? _children;
+  @override
+  List<LazyLoadedGeneralNode<T>> _children = [];
   bool _childrenLoaded = false;
 
   /// Loads the children of the current node.
@@ -60,6 +61,26 @@ class LazyLoadedGeneralNode<T> with _SelectedChildMixin {
   /// Gets the children of the current node.
   Future<List<LazyLoadedGeneralNode<T>>> get children async {
     await _ensureChildrenLoaded();
-    return _children!;
+    return _children;
+  }
+  
+  @override
+  void addChildNode(LazyLoadedGeneralNode<T> node) {
+    super.addChildNode(node);
+    childrenUpdater!(_children.map((child) => child.data).toList());
+  }
+
+  void removeChild(T removeData) {
+    removeWhereChild((child) => child == removeData);
+  }
+  
+  void removeWhereChild(bool Function(T) test) {
+    removeWhereChildNode((child) => test(child.data));
+  }
+
+  @override
+  void removeWhereChildNode(bool Function(LazyLoadedGeneralNode<T> p1) test) {
+    super.removeWhereChildNode(test);
+    childrenUpdater!(_children.map((child) => child.data).toList());
   }
 }

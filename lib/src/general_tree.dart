@@ -21,6 +21,7 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [chain]: Returns the chain of nodes starting from this node and following the current child nodes.
 /// - [chainData]: Returns the list of data of the nodes in the chain.
 /// - [addChild]: Adds a new child node with the given data.
+/// - [addChildNode]: Adds a new child node.
 /// - [removeChild]: Removes a child node with the given data.
 /// - [removeChildNode]: Removes the given child node.
 /// - [removeWhereChild]: Removes a child node that satisfies the given test.
@@ -31,7 +32,7 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
 /// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
 /// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
-class GeneralTreeNode<T> with _SelectedChildMixin {
+class GeneralTreeNode<T> with _SelectedChildMixin, _AddAndRemoveChildMixin<GeneralTreeNode<T>> {
   /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
   ///
   /// The [data] parameter is the value stored in the node.
@@ -49,10 +50,11 @@ class GeneralTreeNode<T> with _SelectedChildMixin {
   /// It can be `null` if the current node is the root of the tree.
   GeneralTreeNode<T>? parent;
 
+  @override
   final List<GeneralTreeNode<T>> _children = [];
 
   @override
-  int? get _childrenCount => _children.length;
+  int get _childrenCount => _children.length;
 
   /// Gets the current child node of the general tree node.
   ///
@@ -151,8 +153,7 @@ class GeneralTreeNode<T> with _SelectedChildMixin {
   ///
   /// - Parameter newData: The data for the new child node.
   void addChild(T newData) {
-    _children.add(GeneralTreeNode(newData, this));
-    _currentChildIndex = _children.length - 1;
+    addChildNode(GeneralTreeNode<T>(newData, this));
   }
 
   /// Removes a child node from the tree that matches the given data.
@@ -163,17 +164,6 @@ class GeneralTreeNode<T> with _SelectedChildMixin {
   /// - Parameter removeData: The data of the child node to be removed.
   void removeChild(T removeData) {
     removeWhereChild((childData) => childData == removeData);
-  }
-
-  /// Removes a child node from the current node's children.
-  ///
-  /// This method removes the specified [removeNode] from the list of children
-  /// of the current node. It uses the `removeWhereChildNode` method to find
-  /// and remove the child node that matches the given [removeNode].
-  ///
-  /// - Parameter removeNode: The child node to be removed.
-  void removeChildNode(GeneralTreeNode<T> removeNode) {
-    removeWhereChildNode((child) => child == removeNode);
   }
 
   /// Removes child nodes that satisfy the given test function.
@@ -192,49 +182,6 @@ class GeneralTreeNode<T> with _SelectedChildMixin {
   ///   `true` if the child node should be removed, and `false` otherwise.
   void removeWhereChild(bool Function(T) test) {
     removeWhereChildNode((child) => test(child.data));
-  }
-
-  /// Removes a child node from the tree that satisfies the given test function.
-  ///
-  /// The [test] function is used to find the index of the child node to be removed.
-  /// If no child node satisfies the test function, a [StateError] is thrown.
-  ///
-  /// After removing the child node, the method updates the [_currentChildIndex] if necessary:
-  /// - If [_currentChildIndex] is greater than the removed index, it is decremented by 1.
-  /// - If [_currentChildIndex] is equal to the removed index, it is set to the last index of the remaining children.
-  /// - If [_currentChildIndex] becomes less than 0, it is set to null.
-  ///
-  /// Example usage:
-  /// ```dart
-  /// tree.removeWhereChildNode((node) => node.value == someValue);
-  /// ```
-  void removeWhereChildNode(bool Function(GeneralTreeNode<T>) test) {
-    if (_children.isEmpty) {
-      return;
-    }
-
-    final index = _children.indexWhere(test);
-
-    if (index == -1) {
-      return;
-    }
-
-    _children.removeAt(index);
-
-    if (_currentChildIndex == null) return;
-
-    if (_currentChildIndex! > index) {
-      _currentChildIndex = _currentChildIndex! - 1;
-      return;
-    }
-
-    if (_currentChildIndex! == index) {
-      _currentChildIndex = _children.length - 1;
-    }
-
-    if (_currentChildIndex! < 0) {
-      _currentChildIndex = null;
-    }
   }
 
   /// Performs a breadth-first search (BFS) on the tree to find a node that satisfies the given test function.
@@ -345,139 +292,5 @@ class GeneralTreeNode<T> with _SelectedChildMixin {
     }
 
     return null;
-  }
-}
-
-/// A class representing a general tree structure with multiple roots.
-///
-/// The [GeneralTree] class allows for the creation and manipulation of a tree
-/// with multiple root nodes. Each root node can have its own subtree.
-///
-/// Type parameter [T] specifies the type of data stored in the tree nodes.
-class GeneralTree<T> {
-  /// Creates a [GeneralTree] with the given list of root nodes.
-  ///
-  /// If the list of roots is not empty, the current root index is set to 0.
-  GeneralTree(this.roots) {
-    if (roots.isNotEmpty) {
-      _currentRootIndex = 0;
-    }
-  }
-
-  /// The list of root nodes in the tree.
-  final List<GeneralTreeNode<T>> roots;
-
-  /// The index of the current root node.
-  ///
-  /// This is `null` if there are no root nodes.
-  int? _currentRootIndex;
-
-  /// Gets the index of the current root node.
-  int? get currentRootIndex => _currentRootIndex;
-
-  /// Gets the current root node.
-  ///
-  /// Returns `null` if there is no current root node.
-  GeneralTreeNode<T>? get currentRoot =>
-      _currentRootIndex != null ? roots[_currentRootIndex!] : null;
-
-  /// Returns the chain of `GeneralTreeNode` objects starting from the current root.
-  ///
-  /// If `_currentRootIndex` is `null`, an empty list is returned.
-  /// Otherwise, it returns the chain of nodes from the root at `_currentRootIndex`.
-  List<GeneralTreeNode<T>> get chain {
-    if (_currentRootIndex == null) {
-      return [];
-    }
-
-    return roots[_currentRootIndex!].chain;
-  }
-
-  /// Returns the list of data from the nodes in the chain.
-  List<T> get chainData => chain.map((node) => node.data).toList();
-
-  /// Adds a new root node with the given data.
-  ///
-  /// The new root node is created with the provided [data] and is added to the list of roots.
-  void addRoot(T data) {
-    roots.add(GeneralTreeNode(data));
-    _currentRootIndex = roots.length - 1;
-  }
-
-  /// Removes the root node with the given data.
-  void removeRoot(T removeData) {
-    removeWhereRoot((rootData) => rootData == removeData);
-  }
-
-  /// Removes the specified root node.
-  void removeRootNode(GeneralTreeNode<T> removeNode) {
-    removeWhereRootNode((node) => node == removeNode);
-  }
-
-  /// Removes the root node that satisfies the given test.
-  void removeWhereRoot(bool Function(T) test) {
-    removeWhereRootNode((node) => test(node.data));
-  }
-
-  /// Removes the root node that satisfies the given test.
-  void removeWhereRootNode(bool Function(GeneralTreeNode<T>) test) {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    final index = roots.indexWhere(test);
-
-    if (index == -1) {
-      return;
-    }
-
-    roots.removeAt(index);
-
-    if (_currentRootIndex == null) return;
-
-    if (_currentRootIndex! > index) {
-      _currentRootIndex = _currentRootIndex! - 1;
-      return;
-    }
-
-    if (_currentRootIndex! == index) {
-      _currentRootIndex = roots.length - 1;
-    }
-
-    if (_currentRootIndex! < 0) {
-      _currentRootIndex = null;
-    }
-  }
-
-  /// Moves to the next root node.
-  ///
-  /// If the current root index is `null`, it is set to 0.
-  /// If the current root index is the last root node, it remains unchanged.
-  void nextRoot() {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    _currentRootIndex ??= 0;
-
-    if (_currentRootIndex! < roots.length - 1) {
-      _currentRootIndex = _currentRootIndex! + 1;
-    }
-  }
-
-  /// Moves to the previous root node.
-  ///
-  /// If the current root index is `null`, it is set to 0.
-  /// If the current root index is the first root node, it remains unchanged.
-  void previousRoot() {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    _currentRootIndex ??= 0;
-
-    if (_currentRootIndex! > 0) {
-      _currentRootIndex = _currentRootIndex! - 1;
-    }
   }
 }

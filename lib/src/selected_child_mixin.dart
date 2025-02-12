@@ -8,7 +8,7 @@ mixin _SelectedChildMixin {
   /// Returns `null` if there is no current child node.
   int? get currentChildIndex => _currentChildIndex;
 
-  int? get _childrenCount;
+  int get _childrenCount;
 
   /// Advances the current child index to the next child in the list of children.
   ///
@@ -18,7 +18,7 @@ mixin _SelectedChildMixin {
   void nextChild() {
     _currentChildIndex ??= 0;
 
-    if (_currentChildIndex! < _childrenCount! - 1) {
+    if (_currentChildIndex! < _childrenCount - 1) {
       _currentChildIndex = _currentChildIndex! + 1;
     }
   }
