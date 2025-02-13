@@ -13,3 +13,7 @@
 ## 1.0.3
 
 - Add chain getters
+
+## 1.0.4
+
+Add toMap and fromMap functions

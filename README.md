@@ -9,11 +9,11 @@ A dart library for working with tree structures.
 
 ## Getting started
 
-To use this package, add `trees` as a [dependency in your pubspec.yaml file](https://flutter.dev/docs/development/packages-and-plugins/using-packages).
+To use this package, add `tree_structs` as a [dependency in your pubspec.yaml file](https://flutter.dev/docs/development/packages-and-plugins/using-packages).
 
 ```yaml
 dependencies:
-  tree_structs: ^1.0.3
+  tree_structs: ^1.0.4
 ```
 
 Import the package in your code:
@@ -27,16 +27,16 @@ import 'package:tree_structs/tree_structs.dart';
 An example of creating a tree and traversing it:
 
 ```dart
-final tree = GeneralTree<String>([]);
-tree.addRoot('root');
-tree.currentRoot!.chain[0].addChild('child1');
-tree.currentRoot!.chain[0].addChild('child2');
-tree.currentRoot!.chain[1].addChild('grandchild1');
-tree.currentRoot!.chain[1].addChild('grandchild2');
-tree.currentRoot!.chain[2].addChild('greatgrandchild1');
-tree.currentRoot!.chain[2].addChild('greatgrandchild2');
+final root = GeneralTreeNode<String>('root');
 
-print(tree.currentRoot!.chainData);
+root.chain[0].addChild('child1');
+root.chain[0].addChild('child2');
+root.chain[1].addChild('grandchild1');
+root.chain[1].addChild('grandchild2');
+root.chain[2].addChild('greatgrandchild1');
+root.chain[2].addChild('greatgrandchild2');
+
+print(root.chainData);
 ```
 
 ## License
