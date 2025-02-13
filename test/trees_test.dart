@@ -154,5 +154,83 @@ void main() {
       final result = root.dfsNode((node) => node.data == 4);
       expect(result?.data, 4);
     });
+
+    test('toMap should correctly serialize a single node', () {
+      final node = GeneralTreeNode<int>(42);
+      final map = node.toMap();
+
+      expect(map, {
+        'data': 42,
+        'children': [],
+      });
+    });
+
+    test('toMap should correctly serialize a tree structure', () {
+      final root = GeneralTreeNode<int>(1);
+      root.chain[0].addChild(2);
+      root.chain[1].addChild(3);
+      root.chain[0].addChild(4);
+      root.chain[1].addChild(5);
+      
+      final map = root.toMap();
+
+      expect(map, {
+        'data': 1,
+        'children': [
+          {
+            'data': 2,
+            'children': [
+              {'data': 3, 'children': []},
+            ],
+          },
+          {
+            'data': 4,
+            'children': [
+              {'data': 5, 'children': []},
+            ],
+          },
+        ],
+      });
+    });
+
+    test('fromMap should correctly deserialize a single node', () {
+      final map = {
+        'data': 42,
+        'children': [],
+      };
+
+      final node = GeneralTreeNode<int>.fromMap(map);
+      expect(node.data, 42);
+      expect(node.children, isEmpty);
+    });
+
+    test('fromMap should correctly deserialize a tree structure', () {
+      final map = {
+        'data': 1,
+        'children': [
+          {
+            'data': 2,
+            'children': [
+              {'data': 4, 'children': []},
+            ],
+          },
+          {
+            'data': 3,
+            'children': [
+              {'data': 5, 'children': []},
+            ],
+          },
+        ],
+      };
+
+      final root = GeneralTreeNode<int>.fromMap(map);
+
+      expect(root.data, 1);
+      expect(root.children.length, 2);
+      expect(root.children[0].data, 2);
+      expect(root.children[0].children[0].data, 4);
+      expect(root.children[1].data, 3);
+      expect(root.children[1].children[0].data, 5);
+    });
   });
 }
