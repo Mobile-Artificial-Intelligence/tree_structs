@@ -38,6 +38,39 @@ class GeneralTreeNode<T> {
   /// The [parent] parameter is the parent node of this node, if any.
   GeneralTreeNode(this.data, [this.parent]);
 
+  /// Creates a [GeneralTreeNode] from a map representation.
+  ///
+  /// The [map] parameter is a `Map<String, dynamic>` that contains the data
+  /// and children of the node. The optional [dataFromMap] parameter is a 
+  /// function that converts the map's 'data' entry to the desired type [T].
+  /// The optional [parent] parameter is the parent node of the newly created node.
+  ///
+  /// The function first extracts the data from the map using [dataFromMap] if
+  /// provided, otherwise it directly uses the 'data' entry from the map. It then
+  /// creates a new [GeneralTreeNode] with the extracted data and the provided parent.
+  ///
+  /// The function iterates over the 'children' entry in the map, recursively
+  /// creating child nodes and adding them to the newly created node.
+  ///
+  /// The `_currentChildIndex` is set to `null` if there are no children, otherwise
+  /// it is set to 0. The children are then added to the node's `_children` list.
+  ///
+  /// Returns the newly created [GeneralTreeNode].
+  factory GeneralTreeNode.fromMap(Map<String, dynamic> map, [T Function(Map<String, dynamic>)? dataFromMap, GeneralTreeNode<T>? parent]) {
+    final data = dataFromMap != null ? dataFromMap(map['data']) : map['data'];
+    final GeneralTreeNode<T> node = GeneralTreeNode(data, parent);
+
+    List<GeneralTreeNode<T>> children = [];
+    for (final child in map['children']) {
+      children.add(GeneralTreeNode.fromMap(child, dataFromMap, node));
+    }
+
+    node._currentChildIndex = children.isEmpty ? null : 0;
+    node._children.addAll(children);
+
+    return node;
+  }
+
   /// The data stored in the node of the tree.
   ///
   /// This is a generic type [T] which allows the tree to store any type of data.
@@ -368,138 +401,19 @@ class GeneralTreeNode<T> {
 
     return null;
   }
-}
 
-/// A class representing a general tree structure with multiple roots.
-///
-/// The [GeneralTree] class allows for the creation and manipulation of a tree
-/// with multiple root nodes. Each root node can have its own subtree.
-///
-/// Type parameter [T] specifies the type of data stored in the tree nodes.
-class GeneralTree<T> {
-  /// Creates a [GeneralTree] with the given list of root nodes.
+  /// Converts the tree structure to a map representation.
   ///
-  /// If the list of roots is not empty, the current root index is set to 0.
-  GeneralTree(this.roots) {
-    if (roots.isNotEmpty) {
-      _currentRootIndex = 0;
-    }
-  }
-
-  /// The list of root nodes in the tree.
-  final List<GeneralTreeNode<T>> roots;
-
-  /// The index of the current root node.
+  /// The `dataToMap` parameter is an optional function that converts the data
+  /// of type `T` to a `Map<String, dynamic>`. If `dataToMap` is not provided,
+  /// the data is included as is.
   ///
-  /// This is `null` if there are no root nodes.
-  int? _currentRootIndex;
-
-  /// Gets the index of the current root node.
-  int? get currentRootIndex => _currentRootIndex;
-
-  /// Gets the current root node.
+  /// Returns a `Map<String, dynamic>` containing the tree data and its children.
   ///
-  /// Returns `null` if there is no current root node.
-  GeneralTreeNode<T>? get currentRoot =>
-      _currentRootIndex != null ? roots[_currentRootIndex!] : null;
-
-  /// Returns the chain of `GeneralTreeNode` objects starting from the current root.
-  ///
-  /// If `_currentRootIndex` is `null`, an empty list is returned.
-  /// Otherwise, it returns the chain of nodes from the root at `_currentRootIndex`.
-  List<GeneralTreeNode<T>> get chain {
-    if (_currentRootIndex == null) {
-      return [];
-    }
-
-    return roots[_currentRootIndex!].chain;
-  }
-
-  /// Returns the list of data from the nodes in the chain.
-  List<T> get chainData => chain.map((node) => node.data).toList();
-
-  /// Adds a new root node with the given data.
-  ///
-  /// The new root node is created with the provided [data] and is added to the list of roots.
-  void addRoot(T data) {
-    roots.add(GeneralTreeNode(data));
-    _currentRootIndex = roots.length - 1;
-  }
-
-  /// Removes the root node with the given data.
-  void removeRoot(T removeData) {
-    removeWhereRoot((rootData) => rootData == removeData);
-  }
-
-  /// Removes the specified root node.
-  void removeRootNode(GeneralTreeNode<T> removeNode) {
-    removeWhereRootNode((node) => node == removeNode);
-  }
-
-  /// Removes the root node that satisfies the given test.
-  void removeWhereRoot(bool Function(T) test) {
-    removeWhereRootNode((node) => test(node.data));
-  }
-
-  /// Removes the root node that satisfies the given test.
-  void removeWhereRootNode(bool Function(GeneralTreeNode<T>) test) {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    final index = roots.indexWhere(test);
-
-    if (index == -1) {
-      return;
-    }
-
-    roots.removeAt(index);
-
-    if (_currentRootIndex == null) return;
-
-    if (_currentRootIndex! > index) {
-      _currentRootIndex = _currentRootIndex! - 1;
-      return;
-    }
-
-    if (_currentRootIndex! == index) {
-      _currentRootIndex = roots.length - 1;
-    }
-
-    if (_currentRootIndex! < 0) {
-      _currentRootIndex = null;
-    }
-  }
-
-  /// Moves to the next root node.
-  ///
-  /// If the current root index is `null`, it is set to 0.
-  /// If the current root index is the last root node, it remains unchanged.
-  void nextRoot() {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    _currentRootIndex ??= 0;
-
-    if (_currentRootIndex! < roots.length - 1) {
-      _currentRootIndex = _currentRootIndex! + 1;
-    }
-  }
-
-  /// Moves to the previous root node.
-  ///
-  /// If the current root index is `null`, it is set to 0.
-  /// If the current root index is the first root node, it remains unchanged.
-  void previousRoot() {
-    if (roots.isEmpty) {
-      return;
-    }
-
-    _currentRootIndex ??= 0;
-
-    if (_currentRootIndex! > 0) {
-      _currentRootIndex = _currentRootIndex! - 1;
-    }
-  }
+  /// - `data`: The data of the current node, converted using `dataToMap` if provided.
+  /// - `children`: A list of maps representing the children of the current node.
+  Map<String, dynamic> toMap([Map<String, dynamic> Function(T)? dataToMap]) => {
+    'data': dataToMap != null ? dataToMap(data) : data,
+    'children': _children.map((child) => child.toMap(dataToMap)).toList(),
+  };
 }
