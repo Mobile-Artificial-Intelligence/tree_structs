@@ -65,7 +65,7 @@ class GeneralTreeNode<T> {
       children.add(GeneralTreeNode.fromMap(child, dataFromMap, node));
     }
 
-    node._currentChildIndex = children.isEmpty ? null : 0;
+    node._currentChildIndex = children.isEmpty ? null : map['index'] ?? 0;
     node._children.addAll(children);
 
     return node;
@@ -414,6 +414,7 @@ class GeneralTreeNode<T> {
   /// - `children`: A list of maps representing the children of the current node.
   Map<String, dynamic> toMap([Map<String, dynamic> Function(T)? dataToMap]) => {
     'data': dataToMap != null ? dataToMap(data) : data,
+    'index': _currentChildIndex,
     'children': _children.map((child) => child.toMap(dataToMap)).toList(),
   };
 }
