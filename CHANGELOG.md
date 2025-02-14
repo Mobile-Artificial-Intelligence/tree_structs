@@ -17,3 +17,7 @@
 ## 1.0.4
 
 Add toMap and fromMap functions
+
+## 1.0.5
+
+Update toMap and fromMap functions to use `_currentChildIndex`
