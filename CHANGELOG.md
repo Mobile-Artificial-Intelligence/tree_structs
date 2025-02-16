@@ -21,3 +21,7 @@ Add toMap and fromMap functions
 ## 1.0.5
 
 Update toMap and fromMap functions to use `_currentChildIndex`
+
+## 1.0.6
+
+Roll back sdk version
