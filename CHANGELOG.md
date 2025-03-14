@@ -29,3 +29,7 @@ Roll back sdk version
 ## 1.0.7
 
 Version bump
+
+## 1.0.8
+
+Formatting

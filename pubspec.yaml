@@ -1,7 +1,7 @@
 name: tree_structs
-description: A dart library for working with tree structures.
-version: 1.0.7
-repository: https://github.com/danemadsen/trees
+description: A dart library for working with tree structures. This package allows you to create, manipulate, and traverse trees.
+version: 1.0.8
+repository: https://github.com/Mobile-Artificial-Intelligence/trees
 
 environment:
   sdk: '>=3.3.1 <4.0.0'

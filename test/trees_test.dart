@@ -171,7 +171,7 @@ void main() {
       root.chain[1].addChild(3);
       root.chain[0].addChild(4);
       root.chain[1].addChild(5);
-      
+
       final map = root.toMap();
 
       expect(map, {

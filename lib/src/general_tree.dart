@@ -41,7 +41,7 @@ class GeneralTreeNode<T> {
   /// Creates a [GeneralTreeNode] from a map representation.
   ///
   /// The [map] parameter is a `Map<String, dynamic>` that contains the data
-  /// and children of the node. The optional [dataFromMap] parameter is a 
+  /// and children of the node. The optional [dataFromMap] parameter is a
   /// function that converts the map's 'data' entry to the desired type [T].
   /// The optional [parent] parameter is the parent node of the newly created node.
   ///
@@ -56,7 +56,9 @@ class GeneralTreeNode<T> {
   /// it is set to 0. The children are then added to the node's `_children` list.
   ///
   /// Returns the newly created [GeneralTreeNode].
-  factory GeneralTreeNode.fromMap(Map<String, dynamic> map, [T Function(Map<String, dynamic>)? dataFromMap, GeneralTreeNode<T>? parent]) {
+  factory GeneralTreeNode.fromMap(Map<String, dynamic> map,
+      [T Function(Map<String, dynamic>)? dataFromMap,
+      GeneralTreeNode<T>? parent]) {
     final data = dataFromMap != null ? dataFromMap(map['data']) : map['data'];
     final GeneralTreeNode<T> node = GeneralTreeNode(data, parent);
 
@@ -413,8 +415,8 @@ class GeneralTreeNode<T> {
   /// - `data`: The data of the current node, converted using `dataToMap` if provided.
   /// - `children`: A list of maps representing the children of the current node.
   Map<String, dynamic> toMap([Map<String, dynamic> Function(T)? dataToMap]) => {
-    'data': dataToMap != null ? dataToMap(data) : data,
-    'index': _currentChildIndex,
-    'children': _children.map((child) => child.toMap(dataToMap)).toList(),
-  };
+        'data': dataToMap != null ? dataToMap(data) : data,
+        'index': _currentChildIndex,
+        'children': _children.map((child) => child.toMap(dataToMap)).toList(),
+      };
 }
