@@ -154,6 +154,7 @@ void main() {
 
       expect(map, {
         'data': 42,
+        'index': null,
         'children': [],
       });
     });
@@ -167,19 +168,24 @@ void main() {
 
       final map = root.toMap();
 
+      print(map);
+
       expect(map, {
         'data': 1,
+        'index': 1,
         'children': [
           {
             'data': 2,
+            'index': 0,
             'children': [
-              {'data': 3, 'children': []},
+              {'data': 3, 'index': null, 'children': []},
             ],
           },
           {
             'data': 4,
+            'index': 0,
             'children': [
-              {'data': 5, 'children': []},
+              {'data': 5, 'index': null, 'children': []},
             ],
           },
         ],

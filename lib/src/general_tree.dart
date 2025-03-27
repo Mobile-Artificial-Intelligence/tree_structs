@@ -1,5 +1,14 @@
 part of 'package:tree_structs/tree_structs.dart';
 
+String _generateID() {
+  final random = Random();
+  final codeUnits = List<int>.generate(10, (index) {
+    return random.nextInt(33) + 89;
+  });
+
+  return String.fromCharCodes(codeUnits);
+}
+
 /// A class representing a general tree structure.
 ///
 /// A general tree is a tree structure where each node can have an arbitrary
@@ -30,7 +39,7 @@ class GeneralTree<T> {
   /// Creates a [GeneralTree] with the given [data].
   ///
   /// The [data] parameter is the value stored in the node.
-  GeneralTree(this.data);
+  GeneralTree(this.data, [String? id]) : id = id ?? _generateID();
 
   /// Creates a [GeneralTree] from a map representation.
   ///
@@ -65,6 +74,9 @@ class GeneralTree<T> {
 
     return node;
   }
+
+  /// The unique key of the node in the tree.
+  final String id;
 
   /// The data stored in the node of the tree.
   ///
