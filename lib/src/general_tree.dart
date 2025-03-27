@@ -1,23 +1,23 @@
 part of 'package:tree_structs/tree_structs.dart';
 
-/// A class representing a node in a general tree structure.
+/// A class representing a general tree structure.
 ///
-/// Each node contains data of type [T], a reference to its parent node, and a list of its children nodes.
-///
+/// A general tree is a tree structure where each node can have an arbitrary
+/// number of children. Each node contains data of type [T] and a list of its
+/// children nodes.
+/// 
 /// The class provides methods for tree traversal, manipulation, and querying.
 ///
 /// - [data]: The data contained in the node.
-/// - [parent]: The parent node of this node.
 /// - [_children]: The list of children nodes of this node.
 /// - [_currentChildIndex]: The index of the current child node.
-///
+/// 
 /// Methods:
 ///
+/// - [currentChildIndex]: Returns the index of the current child node.
 /// - [currentChild]: Returns the current child node.
 /// - [children]: Returns the list of children nodes.
 /// - [childrenData]: Returns the list of data of the children nodes.
-/// - [siblings]: Returns the list of sibling nodes.
-/// - [siblingsData]: Returns the list of data of the sibling nodes.
 /// - [chain]: Returns the chain of nodes starting from this node and following the current child nodes.
 /// - [chainData]: Returns the list of data of the nodes in the chain.
 /// - [addChild]: Adds a new child node with the given data.
@@ -25,20 +25,14 @@ part of 'package:tree_structs/tree_structs.dart';
 /// - [removeChildNode]: Removes the given child node.
 /// - [removeWhereChild]: Removes a child node that satisfies the given test.
 /// - [removeWhereChildNode]: Removes a child node that satisfies the given test.
-/// - [nextChild]: Moves to the next child node.
-/// - [previousChild]: Moves to the previous child node.
-/// - [bfs]: Performs a breadth-first search and returns the data of the first node that satisfies the given test.
-/// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
-/// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
-/// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
-class GeneralTreeNode<T> {
-  /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
+/// - [nextChild]: Moves to the next child node.    
+class GeneralTree<T> {
+  /// Creates a [GeneralTree] with the given [data].
   ///
   /// The [data] parameter is the value stored in the node.
-  /// The [parent] parameter is the parent node of this node, if any.
-  GeneralTreeNode(this.data, [this.parent]);
+  GeneralTree(this.data);
 
-  /// Creates a [GeneralTreeNode] from a map representation.
+  /// Creates a [GeneralTree] from a map representation.
   ///
   /// The [map] parameter is a `Map<String, dynamic>` that contains the data
   /// and children of the node. The optional [dataFromMap] parameter is a
@@ -47,7 +41,7 @@ class GeneralTreeNode<T> {
   ///
   /// The function first extracts the data from the map using [dataFromMap] if
   /// provided, otherwise it directly uses the 'data' entry from the map. It then
-  /// creates a new [GeneralTreeNode] with the extracted data and the provided parent.
+  /// creates a new [GeneralTree] with the extracted data and the provided parent.
   ///
   /// The function iterates over the 'children' entry in the map, recursively
   /// creating child nodes and adding them to the newly created node.
@@ -55,16 +49,15 @@ class GeneralTreeNode<T> {
   /// The `_currentChildIndex` is set to `null` if there are no children, otherwise
   /// it is set to 0. The children are then added to the node's `_children` list.
   ///
-  /// Returns the newly created [GeneralTreeNode].
-  factory GeneralTreeNode.fromMap(Map<String, dynamic> map,
-      [T Function(Map<String, dynamic>)? dataFromMap,
-      GeneralTreeNode<T>? parent]) {
+  /// Returns the newly created [GeneralTree].
+  factory GeneralTree.fromMap(Map<String, dynamic> map,
+      [T Function(Map<String, dynamic>)? dataFromMap]) {
     final data = dataFromMap != null ? dataFromMap(map['data']) : map['data'];
-    final GeneralTreeNode<T> node = GeneralTreeNode(data, parent);
+    final GeneralTree<T> node = GeneralTree(data);
 
     List<GeneralTreeNode<T>> children = [];
     for (final child in map['children']) {
-      children.add(GeneralTreeNode.fromMap(child, dataFromMap, node));
+      children.add(GeneralTreeNode.fromMap(child, node, dataFromMap));
     }
 
     node._currentChildIndex = children.isEmpty ? null : map['index'] ?? 0;
@@ -78,13 +71,7 @@ class GeneralTreeNode<T> {
   /// This is a generic type [T] which allows the tree to store any type of data.
   final T data;
 
-  /// The parent node of the current node in the general tree.
-  ///
-  /// This property holds a reference to the parent node of type `GeneralTreeNode<T>?`.
-  /// It can be `null` if the current node is the root of the tree.
-  final GeneralTreeNode<T>? parent;
-
-  final List<GeneralTreeNode<T>> _children = [];
+  final List<GeneralTree<T>> _children = [];
 
   int? _currentChildIndex;
 
@@ -97,7 +84,7 @@ class GeneralTreeNode<T> {
   ///
   /// Returns the current child node if the `_currentChildIndex` is not null,
   /// otherwise returns null.
-  GeneralTreeNode<T>? get currentChild =>
+  GeneralTree<T>? get currentChild =>
       _currentChildIndex != null ? _children[_currentChildIndex!] : null;
 
   /// Returns the list of child nodes of the current tree node.
@@ -110,8 +97,8 @@ class GeneralTreeNode<T> {
   /// var children = node.children;
   /// ```
   ///
-  /// Returns a `List<GeneralTreeNode<T>>` representing the child nodes.
-  List<GeneralTreeNode<T>> get children => _children;
+  /// Returns a `List<GeneralTree<T>>` representing the child nodes.
+  List<GeneralTree<T>> get children => _children;
 
   /// Returns a list of data from the children nodes.
   ///
@@ -119,31 +106,14 @@ class GeneralTreeNode<T> {
   /// property from each child node, returning a list of these data values.
   List<T> get childrenData => _children.map((child) => child.data).toList();
 
-  /// Returns a list of sibling nodes.
-  ///
-  /// If the current node has no parent, an empty list is returned.
-  /// Otherwise, it returns all children of the parent node except the current node.
-  List<GeneralTreeNode<T>> get siblings {
-    if (parent == null) {
-      return [];
-    }
-    return parent!.children.where((child) => child != this).toList();
-  }
-
-  /// Returns a list of data from the sibling nodes.
-  ///
-  /// This getter maps over the sibling nodes and extracts their data,
-  /// returning a list of the data from each sibling.
-  List<T> get siblingsData => siblings.map((sibling) => sibling.data).toList();
-
-  /// Returns a list of `GeneralTreeNode<T>` representing the chain of nodes
+  /// Returns a list of `GeneralTree<T>` representing the chain of nodes
   /// starting from the current node and following the `currentChild` references
   /// until a node with no `currentChild` is found.
   ///
   /// The first element in the list is the current node, and each subsequent
   /// element is the `currentChild` of the previous node.
-  List<GeneralTreeNode<T>> get chain {
-    final List<GeneralTreeNode<T>> chain = [this];
+  List<GeneralTree<T>> get chain {
+    final List<GeneralTree<T>> chain = [this];
 
     while (chain.last.currentChild != null) {
       chain.add(chain.last.currentChild!);
@@ -152,34 +122,11 @@ class GeneralTreeNode<T> {
     return chain;
   }
 
-  /// Returns a list of `GeneralTreeNode<T>` representing the chain of nodes
-  /// starting from the current node and following the `parent` references
-  /// until a node with no `parent` is found.
-  ///
-  /// The last element in the list is the root node, and each subsequent
-  /// element is the `child` of the previous node.
-  List<GeneralTreeNode<T>> get reverseChain {
-    final List<GeneralTreeNode<T>> chain = [this];
-
-    while (chain.last.parent != null) {
-      chain.add(chain.last.parent!);
-    }
-
-    return chain.reversed.toList();
-  }
-
   /// Returns a list of data from the nodes in the chain.
   ///
   /// This getter maps each node in the chain to its data and collects
   /// them into a list.
   List<T> get chainData => chain.map((node) => node.data).toList();
-
-  /// Returns a list of data from the nodes in the reverse chain.
-  ///
-  /// This getter maps each node in the reverse chain to its data and collects
-  /// them into a list.
-  List<T> get reverseChainData =>
-      reverseChain.map((node) => node.data).toList();
 
   /// Adds a new child node with the given data to the current node.
   ///
@@ -211,7 +158,7 @@ class GeneralTreeNode<T> {
   /// and remove the child node that matches the given [removeNode].
   ///
   /// - Parameter removeNode: The child node to be removed.
-  void removeChildNode(GeneralTreeNode<T> removeNode) {
+  void removeChildNode(GeneralTree<T> removeNode) {
     removeWhereChildNode((child) => child == removeNode);
   }
 
@@ -247,7 +194,7 @@ class GeneralTreeNode<T> {
   /// ```dart
   /// tree.removeWhereChildNode((node) => node.value == someValue);
   /// ```
-  void removeWhereChildNode(bool Function(GeneralTreeNode<T>) test) {
+  void removeWhereChildNode(bool Function(GeneralTree<T>) test) {
     if (_children.isEmpty) {
       return;
     }
@@ -341,7 +288,7 @@ class GeneralTreeNode<T> {
   /// The search first checks the current node, then its immediate children,
   /// and then recursively checks the children of each child node.
   ///
-  /// The [test] function is a predicate that takes a [GeneralTreeNode] and
+  /// The [test] function is a predicate that takes a [GeneralTree] and
   /// returns a boolean indicating whether the node satisfies the condition.
   ///
   /// Returns the first node that satisfies the [test] function, or `null` if
@@ -356,7 +303,7 @@ class GeneralTreeNode<T> {
   ///   print('Node not found');
   /// }
   /// ```
-  GeneralTreeNode<T>? bfsNode(bool Function(GeneralTreeNode<T>) test) {
+  GeneralTree<T>? bfsNode(bool Function(GeneralTree<T>) test) {
     if (test(this)) {
       return this;
     }
@@ -385,11 +332,11 @@ class GeneralTreeNode<T> {
   /// The search starts from the current node and proceeds to its children
   /// recursively.
   ///
-  /// - Parameter test: A function that takes a `GeneralTreeNode<T>` and returns
+  /// - Parameter test: A function that takes a `GeneralTree<T>` and returns
   ///   a boolean indicating whether the node satisfies the condition.
-  /// - Returns: The first `GeneralTreeNode<T>` that satisfies the test function,
+  /// - Returns: The first `GeneralTree<T>` that satisfies the test function,
   ///   or `null` if no such node is found.
-  GeneralTreeNode<T>? dfsNode(bool Function(GeneralTreeNode<T>) test) {
+  GeneralTree<T>? dfsNode(bool Function(GeneralTree<T>) test) {
     if (test(this)) {
       return this;
     }
@@ -419,4 +366,120 @@ class GeneralTreeNode<T> {
         'index': _currentChildIndex,
         'children': _children.map((child) => child.toMap(dataToMap)).toList(),
       };
+}
+
+/// A class representing a node in a general tree structure.
+///
+/// Each node contains data of type [T], a reference to its parent node, and a list of its children nodes.
+///
+/// The class provides methods for tree traversal, manipulation, and querying.
+///
+/// - [data]: The data contained in the node.
+/// - [parent]: The parent node of this node.
+/// - [_children]: The list of children nodes of this node.
+/// - [_currentChildIndex]: The index of the current child node.
+///
+/// Methods:
+///
+/// - [currentChild]: Returns the current child node.
+/// - [children]: Returns the list of children nodes.
+/// - [childrenData]: Returns the list of data of the children nodes.
+/// - [siblings]: Returns the list of sibling nodes.
+/// - [siblingsData]: Returns the list of data of the sibling nodes.
+/// - [chain]: Returns the chain of nodes starting from this node and following the current child nodes.
+/// - [chainData]: Returns the list of data of the nodes in the chain.
+/// - [addChild]: Adds a new child node with the given data.
+/// - [removeChild]: Removes a child node with the given data.
+/// - [removeChildNode]: Removes the given child node.
+/// - [removeWhereChild]: Removes a child node that satisfies the given test.
+/// - [removeWhereChildNode]: Removes a child node that satisfies the given test.
+/// - [nextChild]: Moves to the next child node.
+/// - [previousChild]: Moves to the previous child node.
+/// - [bfs]: Performs a breadth-first search and returns the data of the first node that satisfies the given test.
+/// - [dfs]: Performs a depth-first search and returns the data of the first node that satisfies the given test.
+/// - [bfsNode]: Performs a breadth-first search and returns the first node that satisfies the given test.
+/// - [dfsNode]: Performs a depth-first search and returns the first node that satisfies the given test.
+class GeneralTreeNode<T> extends GeneralTree<T> {
+  /// Creates a [GeneralTreeNode] with the given [data] and an optional [parent].
+  ///
+  /// The [data] parameter is the value stored in the node.
+  /// The [parent] parameter is the parent node of this node, if any.
+  GeneralTreeNode(super.data, this.parent);
+
+  /// Creates a [GeneralTree] from a map representation.
+  ///
+  /// The [map] parameter is a `Map<String, dynamic>` that contains the data
+  /// and children of the node. The optional [dataFromMap] parameter is a
+  /// function that converts the map's 'data' entry to the desired type [T].
+  /// The optional [parent] parameter is the parent node of the newly created node.
+  ///
+  /// The function first extracts the data from the map using [dataFromMap] if
+  /// provided, otherwise it directly uses the 'data' entry from the map. It then
+  /// creates a new [GeneralTree] with the extracted data and the provided parent.
+  ///
+  /// The function iterates over the 'children' entry in the map, recursively
+  /// creating child nodes and adding them to the newly created node.
+  ///
+  /// The `_currentChildIndex` is set to `null` if there are no children, otherwise
+  /// it is set to 0. The children are then added to the node's `_children` list.
+  ///
+  /// Returns the newly created [GeneralTree].
+  factory GeneralTreeNode.fromMap(
+    Map<String, dynamic> map,
+    GeneralTree<T> parent,
+      [T Function(Map<String, dynamic>)? dataFromMap]) {
+    final data = dataFromMap != null ? dataFromMap(map['data']) : map['data'];
+    final GeneralTreeNode<T> node = GeneralTreeNode(data, parent);
+
+    List<GeneralTreeNode<T>> children = [];
+    for (final child in map['children']) {
+      children.add(GeneralTreeNode.fromMap(child, node, dataFromMap));
+    }
+
+    node._currentChildIndex = children.isEmpty ? null : map['index'] ?? 0;
+    node._children.addAll(children);
+
+    return node;
+  }
+
+  /// The parent node of the current node in the general tree.
+  ///
+  /// This property holds a reference to the parent node of type `GeneralTree<T>?`.
+  /// It can be `null` if the current node is the root of the tree.
+  final GeneralTree<T> parent;
+
+  /// Returns a list of sibling nodes.
+  ///
+  /// If the current node has no parent, an empty list is returned.
+  /// Otherwise, it returns all children of the parent node except the current node.
+  List<GeneralTree<T>> get siblings => parent.children.where((child) => child != this).toList();
+
+  /// Returns a list of data from the sibling nodes.
+  ///
+  /// This getter maps over the sibling nodes and extracts their data,
+  /// returning a list of the data from each sibling.
+  List<T> get siblingsData => siblings.map((sibling) => sibling.data).toList();
+
+  /// Returns a list of `GeneralTree<T>` representing the chain of nodes
+  /// starting from the current node and following the `parent` references
+  /// until a node with no `parent` is found.
+  ///
+  /// The last element in the list is the root node, and each subsequent
+  /// element is the `child` of the previous node.
+  List<GeneralTree<T>> get reverseChain {
+    final List<GeneralTree<T>> chain = [this];
+
+    while (chain.last is GeneralTreeNode<T>) {
+      chain.add((chain.last as GeneralTreeNode<T>).parent);
+    }
+
+    return chain.reversed.toList();
+  }
+
+  /// Returns a list of data from the nodes in the reverse chain.
+  ///
+  /// This getter maps each node in the reverse chain to its data and collects
+  /// them into a list.
+  List<T> get reverseChainData =>
+      reverseChain.map((node) => node.data).toList();
 }

@@ -1,7 +1,7 @@
 import 'package:tree_structs/tree_structs.dart';
 
 void main() {
-  final root = GeneralTreeNode<String>('root');
+  final root = GeneralTree<String>('root');
   root.chain[0].addChild('child1');
   root.chain[0].addChild('child2');
   root.chain[1].addChild('grandchild1');
