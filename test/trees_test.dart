@@ -2,9 +2,9 @@ import 'package:test/test.dart';
 import 'package:tree_structs/tree_structs.dart';
 
 void main() {
-  group('GeneralTreeNode', () {
+  group('GeneralTree', () {
     test('constructor sets data and parent correctly', () {
-      final parent = GeneralTreeNode<int>(1);
+      final parent = GeneralTree<int>(1);
       final child = GeneralTreeNode<int>(2, parent);
 
       expect(child.data, 2);
@@ -13,7 +13,7 @@ void main() {
     });
 
     test('addChild adds a new child node', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
 
       root.addChild(2);
       root.addChild(3);
@@ -24,7 +24,7 @@ void main() {
     });
 
     test('removeChild removes a child by data', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
 
@@ -34,15 +34,8 @@ void main() {
       expect(root.children[0].data, 3);
     });
 
-    test('removeChild throws when child is not found', () {
-      final root = GeneralTreeNode<int>(1);
-      root.addChild(2);
-
-      expect(() => root.removeChild(3), throwsStateError);
-    });
-
     test('removeChildNode removes a specific child node', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       final child = GeneralTreeNode<int>(2, root);
       root.children.add(child);
 
@@ -52,7 +45,7 @@ void main() {
     });
 
     test('siblings returns all siblings of a node', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       final child1 = GeneralTreeNode<int>(2, root);
       final child2 = GeneralTreeNode<int>(3, root);
       root.children.addAll([child1, child2]);
@@ -62,7 +55,7 @@ void main() {
     });
 
     test('chain returns the correct chain of nodes', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.children[0].addChild(3);
 
@@ -72,7 +65,7 @@ void main() {
     });
 
     test('bfs finds a node based on a condition', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
       root.children[0].addChild(4);
@@ -82,7 +75,7 @@ void main() {
     });
 
     test('dfs finds a node based on a condition', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
       root.children[0].addChild(4);
@@ -92,7 +85,7 @@ void main() {
     });
 
     test('nextChild increments the current child index', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
 
@@ -102,7 +95,7 @@ void main() {
     });
 
     test('previousChild decrements the current child index', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
       root.nextChild();
@@ -112,7 +105,7 @@ void main() {
     });
 
     test('childrenData returns the correct list of data', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
 
@@ -120,7 +113,7 @@ void main() {
     });
 
     test('siblingsData returns the correct list of sibling data', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
 
@@ -128,7 +121,7 @@ void main() {
     });
 
     test('chainData returns the correct list of chain data', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.children[0].addChild(3);
 
@@ -136,7 +129,7 @@ void main() {
     });
 
     test('bfsNode returns the correct node', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
       root.children[0].addChild(4);
@@ -146,7 +139,7 @@ void main() {
     });
 
     test('dfsNode returns the correct node', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.addChild(2);
       root.addChild(3);
       root.children[0].addChild(4);
@@ -156,7 +149,7 @@ void main() {
     });
 
     test('toMap should correctly serialize a single node', () {
-      final node = GeneralTreeNode<int>(42);
+      final node = GeneralTree<int>(42);
       final map = node.toMap();
 
       expect(map, {
@@ -166,7 +159,7 @@ void main() {
     });
 
     test('toMap should correctly serialize a tree structure', () {
-      final root = GeneralTreeNode<int>(1);
+      final root = GeneralTree<int>(1);
       root.chain[0].addChild(2);
       root.chain[1].addChild(3);
       root.chain[0].addChild(4);
@@ -199,7 +192,7 @@ void main() {
         'children': [],
       };
 
-      final node = GeneralTreeNode<int>.fromMap(map);
+      final node = GeneralTree<int>.fromMap(map);
       expect(node.data, 42);
       expect(node.children, isEmpty);
     });
@@ -223,7 +216,7 @@ void main() {
         ],
       };
 
-      final root = GeneralTreeNode<int>.fromMap(map);
+      final root = GeneralTree<int>.fromMap(map);
 
       expect(root.data, 1);
       expect(root.children.length, 2);

@@ -71,7 +71,7 @@ class GeneralTree<T> {
   /// This is a generic type [T] which allows the tree to store any type of data.
   final T data;
 
-  final List<GeneralTree<T>> _children = [];
+  final List<GeneralTreeNode<T>> _children = [];
 
   int? _currentChildIndex;
 
@@ -84,7 +84,7 @@ class GeneralTree<T> {
   ///
   /// Returns the current child node if the `_currentChildIndex` is not null,
   /// otherwise returns null.
-  GeneralTree<T>? get currentChild =>
+  GeneralTreeNode<T>? get currentChild =>
       _currentChildIndex != null ? _children[_currentChildIndex!] : null;
 
   /// Returns the list of child nodes of the current tree node.
@@ -97,8 +97,8 @@ class GeneralTree<T> {
   /// var children = node.children;
   /// ```
   ///
-  /// Returns a `List<GeneralTree<T>>` representing the child nodes.
-  List<GeneralTree<T>> get children => _children;
+  /// Returns a `List<GeneralTreeNode<T>>` representing the child nodes.
+  List<GeneralTreeNode<T>> get children => _children;
 
   /// Returns a list of data from the children nodes.
   ///
